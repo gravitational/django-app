@@ -5,11 +5,11 @@ metadata:
   name: django-app
   resourceVersion: 0.0.1
   namespace: default
-base: gravitational.io/k8s-onprem:0.0.1
+base: gravitational.io/k8s-onprem:0.0.0+latest
 dependencies:
   apps:
-    - gravitational.io/stolon-app:0.0.1
-    - gravitational.io/pithos-app:0.0.1
+    - gravitational.io/stolon-app:0.0.0+latest
+    - gravitational.io/pithos-app:0.0.0+latest
 installer:
   provisioners:
     virsh:
