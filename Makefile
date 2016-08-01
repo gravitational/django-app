@@ -8,9 +8,7 @@ CONTAINERS := django-bootstrap:$(VER) \
 			  django-uninstall:$(VER)
 
 IMPORT_IMAGE_FLAGS := --set-image=django-bootstrap:$(VER) \
-	--set-image=django-uninstall:$(VER) \
-	--set-dep=gravitational.io/k8s-onprem:$$(gravity app list --ops-url=$(OPS_URL) --insecure | grep -m 1 k8s-onprem | awk '{print $$3}' | cut -d: -f2 | cut -d, -f1) \
-	--set-dep=gravitational.io/stolon-app:$$(gravity app list --ops-url=$(OPS_URL) --insecure | grep -m 1 stolon-app | awk '{print $$3}' | cut -d: -f2 | cut -d, -f1)
+	--set-image=django-uninstall:$(VER)
 
 IMPORT_OPTIONS := --vendor \
 		--ops-url=$(OPS_URL) \
