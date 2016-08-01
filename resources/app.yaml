@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Application
+metadata:
+  repository: gravitational.io
+  name: django-app
+  resourceVersion: 0.0.1
+  namespace: default
+base: gravitational.io/k8s-onprem:0.0.1
+dependencies:
+  apps:
+    - gravitational.io/stolon-app:0.0.1
+installer:
+  provisioners:
+    virsh:
+      variables:
+        devices:
+          - device: vdb
+            mb: 8000
+  servers:
+    master:
+      cpu:
+        min_count: 1
+      ram:
+        min_total_mb: 2000
+      directories:
+        - name: /var/lib/gravity
+          min_total_mb: 4000
+          fs_types: ['xfs', 'btrfs']
+    node:
+      min_count: 2
+      labels:
+        role: "node"
+        stolon-keeper: "yes"
+      cpu:
+        min_count: 1
+      ram:
+        min_total_mb: 2000
+      directories:
+        - name: /var/lib/gravity
+          min_total_mb: 4000
+          fs_types: ['xfs', 'btrfs']
+hooks:
+  install:
+    spec:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: django-app-install
+      spec:
+        template:
+          metadata:
+            name: django-app-install
+          spec:
+            restartPolicy: OnFailure
+            containers:
+              - name: bootstrap
+                image: django-bootstrap:latest
+  uninstall:
+    spec:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: django-app-uninstall
+      spec:
+        template:
+          metadata:
+            name: django-app-uninstall
+          spec:
+            restartPolicy: OnFailure
+            containers:
+              - name: bootstrap
+                image: django-uninstall:latest
