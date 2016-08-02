@@ -11,7 +11,7 @@ images: bootstrap \
 	docker tag $(UNINSTALL_TAG) django-uninstall:latest
 
 .PHONY: bootstrap
-bootstrap: $(djangoBOOT_BINS)
+bootstrap:
 	docker build -t $(BOOTSTRAP_TAG) $(PWD)/bootstrap
 
 .PHONY: uninstall
