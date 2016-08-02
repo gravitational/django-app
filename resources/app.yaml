@@ -8,6 +8,9 @@ metadata:
 service_labels:
   stolon-postgres: "yes"
 base: gravitational.io/k8s-onprem:0.0.1
+dependencies:
+  apps:
+    - gravitational.io/stolon-app:0.0.1
 installer:
   provisioners:
     virsh:
