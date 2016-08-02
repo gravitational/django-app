@@ -19,6 +19,8 @@ installer:
         devices:
           - device: vdb
             mb: 8000
+          - device: vdc
+            mb: 6000
   servers:
     master:
       cpu:
