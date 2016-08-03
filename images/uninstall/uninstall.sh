@@ -1,4 +1,6 @@
 #!/bin/sh
 
-echo "Do nothing"
-exit 0
+#TODO:
+# * backup DB
+# * drop DB
+kubectl delete -f /var/lib/gravity/resources/django.yaml

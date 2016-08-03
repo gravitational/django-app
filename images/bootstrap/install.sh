@@ -1,4 +1,5 @@
 #!/bin/sh
 
-echo "Do nothing"
-exit 0
+#TODO:
+# *create DB
+kubectl create -f /var/lib/gravity/resources/django.yaml
