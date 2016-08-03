@@ -7,10 +7,11 @@ metadata:
   namespace: default
 service_labels:
   stolon-postgres: "yes"
-base: gravitational.io/k8s-onprem:0.0.1
+base: gravitational.io/k8s-onprem:0.0.0+latest
 dependencies:
   apps:
-    - gravitational.io/stolon-app:0.0.1
+    - gravitational.io/stolon-app:0.0.0+latest
+    - gravitational.io/pithos-app:0.0.0+latest
 installer:
   provisioners:
     virsh:
@@ -18,6 +19,8 @@ installer:
         devices:
           - device: vdb
             mb: 8000
+          - device: vdc
+            mb: 6000
   servers:
     master:
       cpu:
