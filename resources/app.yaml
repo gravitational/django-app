@@ -60,7 +60,7 @@ hooks:
             restartPolicy: OnFailure
             containers:
               - name: bootstrap
-                image: django-bootstrap:latest
+                image: django-controller:latest
   uninstall:
     spec:
       apiVersion: batch/v1
@@ -75,4 +75,4 @@ hooks:
             restartPolicy: OnFailure
             containers:
               - name: bootstrap
-                image: django-uninstall:latest
+                image: django-controller:latest
