@@ -37,7 +37,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: stolon
-              key: password
+                key: password
           - name: DEBUG
             value: "false"
         ports:

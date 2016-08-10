@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 echo "Collect static files"
 python3 manage.py collectstatic --noinput
 

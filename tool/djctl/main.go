@@ -4,8 +4,12 @@ import (
 	"os"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/alecthomas/kingpin"
 	"github.com/gravitational/trace"
-	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
+
+const (
+	EnvDatabaseName = "DB_NAME"
 )
 
 type application struct {
@@ -29,8 +33,12 @@ func new() *application {
 }
 
 func (app *application) run() error {
-	cmdInstall := app.Command("install", "install cluster")
-	cmdUninstall := app.Command("uninstall", "uninstall cluster")
+	var dbName string
+	// install
+	cmdInstall := app.Command("install", "install django application")
+	cmdInstall.Flag("db-name", "database name").Envar(EnvDatabaseName).StringVar(&dbName)
+	// uninstall
+	cmdUninstall := app.Command("uninstall", "uninstall django application")
 
 	cmd, err := app.Parse(os.Args[1:])
 	if err != nil {
@@ -39,7 +47,7 @@ func (app *application) run() error {
 
 	switch cmd {
 	case cmdInstall.FullCommand():
-		return install()
+		return install(dbName)
 	case cmdUninstall.FullCommand():
 		return uninstall()
 	}

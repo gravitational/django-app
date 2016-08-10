@@ -39,9 +39,8 @@ spec:
 `
 
 	log.Infof("Create job for creating database %s", name)
-	out, err := rigging.FromStdIn(rigging.ActionCreate, template)
+	err := rigging.FromStdIn(rigging.ActionCreate, template)
 	if err != nil {
-		log.Errorf("%s", string(out))
 		return trace.Wrap(err)
 	}
 
@@ -92,9 +91,8 @@ spec:
 `
 
 	log.Infof("Create job for backup database %s", name)
-	out, err := rigging.FromStdIn(rigging.ActionCreate, template)
+	err := rigging.FromStdIn(rigging.ActionCreate, template)
 	if err != nil {
-		log.Errorf("%s", string(out))
 		return trace.Wrap(err)
 	}
 
@@ -107,7 +105,7 @@ spec:
 	return nil
 }
 
-func restoreDB(name, src string) {
+func restoreDB(name, src string) error {
 	jobName := "stolon-restore"
 	template := `
 apiVersion: batch/v1
@@ -145,9 +143,8 @@ spec:
 `
 
 	log.Infof("Create job for backup database %s", name)
-	out, err := rigging.FromStdIn(rigging.ActionCreate, template)
+	err := rigging.FromStdIn(rigging.ActionCreate, template)
 	if err != nil {
-		log.Errorf("%s", string(out))
 		return trace.Wrap(err)
 	}
 

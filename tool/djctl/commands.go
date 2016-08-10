@@ -9,7 +9,7 @@ import (
 func install(dbName string) error {
 	log.Infof("creating database %s", dbName)
 	if err := createDB(dbName); err != nil {
-		log.Errorf("Database %s already exists", dbName)
+		log.Errorf("Can't create database '%s'. Err: %v", dbName, err)
 	}
 
 	log.Infof("creating django service and replication controller")
