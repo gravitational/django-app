@@ -1,19 +1,31 @@
+VERSION ?= 0.0.1
+
+CONTROLLER_TAG := django-controller:$(VERSION)
+APP_TAG := django-app:$(VERSION)
+
 .PHONY: all
 all: images
 
-BOOTSTRAP_TAG := django-bootstrap:$(VERSION)
-UNINSTALL_TAG := django-uninstall:$(VERSION)
-
 .PHONY: images
-images: bootstrap \
-		uninstall
-	docker tag $(BOOTSTRAP_TAG) django-bootstrap:latest
-	docker tag $(UNINSTALL_TAG) django-uninstall:latest
+images: controller \
+		django
+	docker tag $(CONTROLLER_TAG) django-controller:latest
+	docker tag $(APP_TAG) django-app:latest
 
-.PHONY: bootstrap
-bootstrap:
-	docker build -t $(BOOTSTRAP_TAG) $(PWD)/bootstrap
+CONTROLLER_BINS := controller/bin
+$(CONTROLLER_BINS):
+	$(MAKE) -C ../tool/djctl
+	mkdir $(CONTROLLER_BINS)
+	cp ../tool/djctl/bin/djctl $(CONTROLLER_BINS)/
 
-.PHONY: uninstall
-uninstall:
-	docker build -t $(UNINSTALL_TAG) $(PWD)/uninstall
+.PHONY: controller
+controller: $(CONTROLLER_BINS)
+	docker build -t $(CONTROLLER_TAG) $(PWD)/controller
+
+.PHONY: django
+django:
+	docker build -t $(APP_TAG) $(PWD)/django
+
+.PHONY: clean
+clean:
+	-rm -rf $(CONTROLLER_BINS)

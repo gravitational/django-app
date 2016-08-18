@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-app
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+  selector:
+    django-app: "yes"
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: django-app
+spec:
+  replicas: 1
+  selector:
+    name: django-app
+  template:
+    metadata:
+      labels:
+        name: django-app
+        django-app: "yes"
+    spec:
+      containers:
+      - name: django-app
+        image: apiserver:5000/django-app:latest
+        imagePullPolicy: Always
+        env:
+          - name: DB_NAME
+            value: "django"
+          - name: DB_USERNAME
+            value: "stolon"
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: stolon
+                key: password
+          - name: DEBUG
+            value: "false"
+        ports:
+          - containerPort: 8000
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 10
+          timeoutSeconds: 5

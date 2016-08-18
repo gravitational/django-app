@@ -11,7 +11,6 @@ base: gravitational.io/k8s-onprem:0.0.0+latest
 dependencies:
   apps:
     - gravitational.io/stolon-app:0.0.0+latest
-    - gravitational.io/pithos-app:0.0.0+latest
 installer:
   provisioners:
     virsh:
@@ -60,7 +59,11 @@ hooks:
             restartPolicy: OnFailure
             containers:
               - name: bootstrap
-                image: django-bootstrap:latest
+                image: django-controller:latest
+                args: ["install"]
+                env:
+                  - name: DB_NAME
+                    value: "django"
   uninstall:
     spec:
       apiVersion: batch/v1
@@ -75,4 +78,4 @@ hooks:
             restartPolicy: OnFailure
             containers:
               - name: bootstrap
-                image: django-uninstall:latest
+                image: django-controller:latest
