@@ -8,6 +8,9 @@ spec:
       image: apiserver:5000/django-controller:latest
       imagePullPolicy: Always
       args: ["install"]
+      env:
+        - name: DB_NAME
+          value: "django"
       volumeMounts:
         - mountPath: /var/lib/gravity/resources
           name: resources
