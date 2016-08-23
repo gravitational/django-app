@@ -17,8 +17,6 @@ installer:
     virsh:
       variables:
         devices:
-        sparse_disks: true
-        devices:
           - device: vdb
             mb: 10000
           - device: vdc
@@ -29,7 +27,7 @@ installer:
       cpu:
         min_count: 1
       ram:
-        min_total_mb: 4000
+        min_total_mb: 2000
     node:
       min_count: 3
       cpu:
