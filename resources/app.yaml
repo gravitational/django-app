@@ -7,35 +7,39 @@ metadata:
   namespace: default
 service_labels:
   stolon-postgres: "yes"
-base: gravitational.io/k8s-onprem:0.0.0+latest
+base: gravitational.io/k8s-aws:0.0.0+latest
 dependencies:
   apps:
     - gravitational.io/stolon-app:0.0.0+latest
+    - gravitational.io/pithos-app:0.0.0+latest
 installer:
   provisioners:
     virsh:
       variables:
         devices:
+        sparse_disks: true
+        devices:
           - device: vdb
-            mb: 8000
+            mb: 10000
           - device: vdc
-            mb: 6000
+            mb: 10000
   servers:
     master:
+      min_count: 1
       cpu:
         min_count: 1
       ram:
-        min_total_mb: 2000
+        min_total_mb: 4000
     node:
+      min_count: 3
       cpu:
-        min_count: 1
-      min_count: 2
-      description: "stolon server"
+        min_count: 2
+      ram:
+        min_total_mb: 8000
       labels:
         role: "node"
         stolon-keeper: "yes"
-      ram:
-        min_total_mb: 2000
+        pithos-role: "node"
       directories:
         - name: /var/lib/gravity
           min_total_mb: 4000
@@ -43,6 +47,9 @@ installer:
       mounts:
         - source: /var/lib/data/stolon
           destination: /var/lib/data/stolon
+          create_if_missing: true
+        - source: /cassandra_data
+          destination: /cassandra_data
           create_if_missing: true
 hooks:
   install:
