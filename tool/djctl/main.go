@@ -9,7 +9,9 @@ import (
 )
 
 const (
-	EnvDatabaseName = "DB_NAME"
+	EnvStolonRPCHost = "STOLON_RPC_SERVICE_HOST"
+	EnvStolonRPCPort = "STOLON_RPC_SERVICE_PORT"
+	EnvDatabaseName  = "DB_NAME"
 )
 
 type application struct {
@@ -33,12 +35,21 @@ func new() *application {
 }
 
 func (app *application) run() error {
-	var dbName string
+	var (
+		dbName        string
+		stolonRPCHost string
+		stolonRPCPort string
+	)
 	// install
 	cmdInstall := app.Command("install", "install django application")
 	cmdInstall.Flag("db-name", "database name").Envar(EnvDatabaseName).StringVar(&dbName)
+	cmdInstall.Flag("stolon-rpc-host", "Stolon RPC host").Envar(EnvDatabaseName).StringVar(&stolonRPCHost)
+	cmdInstall.Flag("stolon-rpc-port", "Stolon RPC port").Envar(EnvDatabaseName).StringVar(&stolonRPCPort)
 	// uninstall
 	cmdUninstall := app.Command("uninstall", "uninstall django application")
+	cmdUninstall.Flag("db-name", "database name").Envar(EnvDatabaseName).StringVar(&dbName)
+	cmdUninstall.Flag("stolon-rpc-host", "Stolon RPC host").Envar(EnvDatabaseName).StringVar(&stolonRPCHost)
+	cmdUninstall.Flag("stolon-rpc-port", "Stolon RPC port").Envar(EnvDatabaseName).StringVar(&stolonRPCPort)
 
 	cmd, err := app.Parse(os.Args[1:])
 	if err != nil {
@@ -47,9 +58,9 @@ func (app *application) run() error {
 
 	switch cmd {
 	case cmdInstall.FullCommand():
-		return install(dbName)
+		return install(stolonRPCHost, stolonRPCPort, dbName)
 	case cmdUninstall.FullCommand():
-		return uninstall()
+		return uninstall(stolonRPCHost, stolonRPCPort, dbName)
 	}
 
 	return nil
