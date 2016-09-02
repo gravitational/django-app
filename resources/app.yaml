@@ -11,7 +11,6 @@ base: gravitational.io/k8s-aws:0.0.0+latest
 dependencies:
   apps:
     - gravitational.io/stolon-app:0.0.0+latest
-    - gravitational.io/pithos-app:0.0.0+latest
 installer:
   provisioners:
     virsh:
@@ -19,29 +18,22 @@ installer:
         devices:
           - device: vdb
             mb: 8000
-          - device: vdc
-            mb: 6144
   servers:
     node:
-      min_count: 3
+      min_count: 1
       cpu:
         min_count: 2
       ram:
-        min_total_mb: 8000
+        min_total_mb: 2000
       labels:
         role: "node"
         stolon-keeper: "yes"
-        pithos-role: "node"
       directories:
         - name: /var/lib/gravity
           min_total_mb: 4000
-          fs_types: ["xfs", "btrfs"]
       mounts:
         - source: /var/lib/data/stolon
           destination: /var/lib/data/stolon
-          create_if_missing: true
-        - source: /cassandra_data
-          destination: /cassandra_data
           create_if_missing: true
 hooks:
   install:
@@ -50,6 +42,7 @@ hooks:
       kind: Job
       metadata:
         name: django-app-install
+        namespace: default
       spec:
         template:
           metadata:
@@ -59,7 +52,7 @@ hooks:
             containers:
               - name: bootstrap
                 image: django-controller:latest
-                args: ["install"]
+                command: ["/djctl", "install"]
                 env:
                   - name: DB_NAME
                     value: "django"
@@ -69,6 +62,7 @@ hooks:
       kind: Job
       metadata:
         name: django-app-uninstall
+        namespace: default
       spec:
         template:
           metadata:
@@ -78,3 +72,7 @@ hooks:
             containers:
               - name: bootstrap
                 image: django-controller:latest
+                command: ["/djctl", "uninstall"]
+                env:
+                  - name: DB_NAME
+                    value: "django"
