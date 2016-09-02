@@ -80,7 +80,7 @@ hooks:
             containers:
               - name: bootstrap
                 image: django-controller:latest
-                command: ["/djctl", "install"]
+                command: ["/djctl", "uninstall"]
                 env:
                   - name: DB_NAME
                     value: "django"
