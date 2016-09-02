@@ -36,20 +36,19 @@ func new() *application {
 
 func (app *application) run() error {
 	var (
-		dbName        string
-		stolonRPCHost string
-		stolonRPCPort string
+		clt    Client
+		dbName string
 	)
 	// install
 	cmdInstall := app.Command("install", "install django application")
 	cmdInstall.Flag("db-name", "database name").Envar(EnvDatabaseName).StringVar(&dbName)
-	cmdInstall.Flag("stolon-rpc-host", "Stolon RPC host").Envar(EnvDatabaseName).StringVar(&stolonRPCHost)
-	cmdInstall.Flag("stolon-rpc-port", "Stolon RPC port").Envar(EnvDatabaseName).StringVar(&stolonRPCPort)
+	cmdInstall.Flag("stolon-rpc-host", "Stolon RPC host").Envar(EnvStolonRPCHost).StringVar(&clt.Host)
+	cmdInstall.Flag("stolon-rpc-port", "Stolon RPC port").Envar(EnvStolonRPCPort).StringVar(&clt.Port)
 	// uninstall
 	cmdUninstall := app.Command("uninstall", "uninstall django application")
 	cmdUninstall.Flag("db-name", "database name").Envar(EnvDatabaseName).StringVar(&dbName)
-	cmdUninstall.Flag("stolon-rpc-host", "Stolon RPC host").Envar(EnvDatabaseName).StringVar(&stolonRPCHost)
-	cmdUninstall.Flag("stolon-rpc-port", "Stolon RPC port").Envar(EnvDatabaseName).StringVar(&stolonRPCPort)
+	cmdUninstall.Flag("stolon-rpc-host", "Stolon RPC host").Envar(EnvStolonRPCHost).StringVar(&clt.Host)
+	cmdUninstall.Flag("stolon-rpc-port", "Stolon RPC port").Envar(EnvStolonRPCPort).StringVar(&clt.Port)
 
 	cmd, err := app.Parse(os.Args[1:])
 	if err != nil {
@@ -58,9 +57,9 @@ func (app *application) run() error {
 
 	switch cmd {
 	case cmdInstall.FullCommand():
-		return install(stolonRPCHost, stolonRPCPort, dbName)
+		return Install(clt, dbName)
 	case cmdUninstall.FullCommand():
-		return uninstall(stolonRPCHost, stolonRPCPort, dbName)
+		return Uninstall(clt, dbName)
 	}
 
 	return nil
