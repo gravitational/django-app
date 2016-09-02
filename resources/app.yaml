@@ -18,16 +18,10 @@ installer:
       variables:
         devices:
           - device: vdb
-            mb: 10000
+            mb: 8000
           - device: vdc
-            mb: 10000
+            mb: 6144
   servers:
-    master:
-      min_count: 1
-      cpu:
-        min_count: 1
-      ram:
-        min_total_mb: 2000
     node:
       min_count: 3
       cpu:
@@ -56,6 +50,7 @@ hooks:
       kind: Job
       metadata:
         name: django-app-install
+        namespace: default
       spec:
         template:
           metadata:
@@ -65,7 +60,7 @@ hooks:
             containers:
               - name: bootstrap
                 image: django-controller:latest
-                args: ["install"]
+                command: ["/djctl", "install"]
                 env:
                   - name: DB_NAME
                     value: "django"
@@ -75,6 +70,7 @@ hooks:
       kind: Job
       metadata:
         name: django-app-uninstall
+        namespace: default
       spec:
         template:
           metadata:
@@ -84,3 +80,7 @@ hooks:
             containers:
               - name: bootstrap
                 image: django-controller:latest
+                command: ["/djctl", "uninstall"]
+                env:
+                  - name: DB_NAME
+                    value: "django"

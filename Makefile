@@ -22,7 +22,7 @@ IMPORT_OPTIONS := --vendor \
 				  $(IMPORT_IMAGE_FLAGS)
 
 .PHONY: all
-all: images
+all: clean images
 
 .PHONY: images
 images:
@@ -53,5 +53,5 @@ dev-deploy: dev-push
 
 .PHONY: dev-clean
 dev-clean:
-	-kubectl delete pod/django-app-bootstrap job/stolon-createdb
+	-kubectl delete pod/django-app-bootstrap
 	-kubectl delete -f resources/django.yaml

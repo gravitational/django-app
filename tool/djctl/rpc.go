@@ -10,26 +10,33 @@ import (
 	"github.com/gravitational/trace"
 )
 
-func getRPCClient(stolonRPCHost, stolonRPCPort string) (*rpc.Client, error) {
-	rpcEndpoint := net.JoinHostPort(stolonRPCHost, stolonRPCPort)
-	client, err := rpc.DialHTTP("tcp", rpcEndpoint)
+type Client struct {
+	Host, Port string
+}
+
+func (c *Client) Get() (*rpc.Client, error) {
+	client, err := rpc.DialHTTP("tcp", c.connectionString())
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
 	return client, nil
 }
 
-func install(stolonRPCHost, stolonRPCPort, dbName string) error {
+func (c *Client) connectionString() string {
+	return net.JoinHostPort(c.Host, c.Port)
+}
+
+func Install(c Client, dbName string) error {
 	log.Infof("Creating database '%s'", dbName)
-	client, err := getRPCClient(stolonRPCHost, stolonRPCPort)
+	client, err := c.Get()
 	if err != nil {
-		return trace.Wrap(err, "Dialing to stolon's RPC failed")
+		return trace.Wrap(err, fmt.Sprintf("Dialing to stolon's RPC at '%s' failed", c.connectionString()))
 	}
 
 	var reply string
 	command := "DatabaseOperation.Create"
 	err = client.Call(command, dbName, &reply)
-	log.Infof("Execute RPC command '%s' on stolon's RPC", command)
+	log.Infof("Execute RPC command '%s' on stolon's RPC at '%s'", command, c.connectionString())
 	if err != nil {
 		return trace.Wrap(err, fmt.Sprintf("Can't create database '%s'", dbName))
 	}
@@ -44,7 +51,7 @@ func install(stolonRPCHost, stolonRPCPort, dbName string) error {
 	return nil
 }
 
-func uninstall(stolonRPCHost, stolonRPCPort, dbName string) error {
+func Uninstall(c Client, dbName string) error {
 	log.Infof("Deleting django service and replication controller")
 	out, err := rigging.FromFile(
 		rigging.ActionDelete,
@@ -54,15 +61,15 @@ func uninstall(stolonRPCHost, stolonRPCPort, dbName string) error {
 	}
 
 	log.Infof("Deleting database '%s'", dbName)
-	client, err := getRPCClient(stolonRPCHost, stolonRPCPort)
+	client, err := c.Get()
 	if err != nil {
-		return trace.Wrap(err, "Dialing to stolon's RPC failed")
+		return trace.Wrap(err, fmt.Sprintf("Dialing to stolon's RPC at '%s' failed", c.connectionString()))
 	}
 
 	var reply string
 	command := "DatabaseOperation.Delete"
 	err = client.Call(command, dbName, &reply)
-	log.Infof("Execute RPC command '%s' on stolon's RPC", command)
+	log.Infof("Execute RPC command '%s' on stolon's RPC at '%s'", command, c.connectionString())
 	if err != nil {
 		return trace.Wrap(err, fmt.Sprintf("Can't delete database '%s'", dbName))
 	}
