@@ -50,6 +50,7 @@ hooks:
       kind: Job
       metadata:
         name: django-app-install
+        namespace: default
       spec:
         template:
           metadata:
@@ -59,7 +60,7 @@ hooks:
             containers:
               - name: bootstrap
                 image: django-controller:latest
-                args: ["install"]
+                command: ["/djctl", "install"]
                 env:
                   - name: DB_NAME
                     value: "django"
@@ -69,6 +70,7 @@ hooks:
       kind: Job
       metadata:
         name: django-app-uninstall
+        namespace: default
       spec:
         template:
           metadata:
@@ -78,3 +80,7 @@ hooks:
             containers:
               - name: bootstrap
                 image: django-controller:latest
+                command: ["/djctl", "install"]
+                env:
+                  - name: DB_NAME
+                    value: "django"
