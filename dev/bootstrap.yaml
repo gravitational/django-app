@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: django-app-bootstrap
-      image: apiserver:5000/django-controller:latest
+      image: apiserver:5000/django-controller:0.0.1
       imagePullPolicy: Always
       args: ["install"]
       env:
@@ -29,5 +29,3 @@ spec:
       path: /usr/bin/kubectl
     name: kubectl
   restartPolicy: Never
-  nodeSelector:
-    role: master
