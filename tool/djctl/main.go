@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	EnvStolonRPCHost = "STOLON_RPC_SERVICE_HOST"
-	EnvStolonRPCPort = "STOLON_RPC_SERVICE_PORT"
-	EnvDatabaseName  = "DB_NAME"
+	EnvStolonRPCHost      = "STOLON_RPC_SERVICE_HOST"
+	EnvStolonRPCPort      = "STOLON_RPC_SERVICE_PORT"
+	EnvDatabaseName       = "DB_NAME"
+	EnvDatabaseBackupPath = "DB_BACKUP_PATH"
 )
 
 type application struct {
@@ -35,31 +36,33 @@ func new() *application {
 }
 
 func (app *application) run() error {
-	var (
-		clt    Client
-		dbName string
-	)
-	// install
-	cmdInstall := app.Command("install", "install django application")
-	cmdInstall.Flag("db-name", "database name").Envar(EnvDatabaseName).StringVar(&dbName)
-	cmdInstall.Flag("stolon-rpc-host", "Stolon RPC host").Envar(EnvStolonRPCHost).StringVar(&clt.Host)
-	cmdInstall.Flag("stolon-rpc-port", "Stolon RPC port").Envar(EnvStolonRPCPort).StringVar(&clt.Port)
-	// uninstall
-	cmdUninstall := app.Command("uninstall", "uninstall django application")
-	cmdUninstall.Flag("db-name", "database name").Envar(EnvDatabaseName).StringVar(&dbName)
-	cmdUninstall.Flag("stolon-rpc-host", "Stolon RPC host").Envar(EnvStolonRPCHost).StringVar(&clt.Host)
-	cmdUninstall.Flag("stolon-rpc-port", "Stolon RPC port").Envar(EnvStolonRPCPort).StringVar(&clt.Port)
+	cmdApp := app.Command("app", "operations with django application")
+	rpcHost := cmdApp.Flag("stolon-rpc-host", "Stolon RPC host").Envar(EnvStolonRPCHost).Required().String()
+	rpcPort := cmdApp.Flag("stolon-rpc-port", "Stolon RPC port").Envar(EnvStolonRPCPort).Required().String()
+	dbName := cmdApp.Flag("db-name", "database name").Envar(EnvDatabaseName).Required().String()
+
+	cmdAppInstall := cmdApp.Command("install", "install django application")
+	cmdAppUninstall := cmdApp.Command("uninstall", "uninstall django application")
+	cmdAppUpdate := cmdApp.Command("update", "update django application")
+	dbBackupPath := cmdAppUpdate.Flag("db-backup-path", "Path where database backup will be stored").Envar(EnvDatabaseBackupPath).Required().String()
 
 	cmd, err := app.Parse(os.Args[1:])
 	if err != nil {
 		return trace.Wrap(err)
 	}
 
+	clt, err := NewRPCClient(*rpcHost, *rpcPort)
+	if err != nil {
+		return trace.Wrap(err)
+	}
+
 	switch cmd {
-	case cmdInstall.FullCommand():
-		return Install(clt, dbName)
-	case cmdUninstall.FullCommand():
-		return Uninstall(clt, dbName)
+	case cmdAppInstall.FullCommand():
+		return Install(clt, *dbName)
+	case cmdAppUpdate.FullCommand():
+		return Update(clt, *dbName, *dbBackupPath)
+	case cmdAppUninstall.FullCommand():
+		return Uninstall(clt, *dbName)
 	}
 
 	return nil
