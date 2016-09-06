@@ -52,7 +52,27 @@ hooks:
             containers:
               - name: bootstrap
                 image: django-controller:latest
-                command: ["/djctl", "install"]
+                command: ["/djctl", "app", "install"]
+                env:
+                  - name: DB_NAME
+                    value: "django"
+  update:
+    spec:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: django-app-update
+        namespace: default
+      spec:
+        template:
+          metadata:
+            name: django-app-update
+          spec:
+            restartPolicy: OnFailure
+            containers:
+              - name: bootstrap
+                image: django-controller:latest
+                command: ["/djctl", "app", "update"]
                 env:
                   - name: DB_NAME
                     value: "django"
@@ -72,7 +92,7 @@ hooks:
             containers:
               - name: bootstrap
                 image: django-controller:latest
-                command: ["/djctl", "uninstall"]
+                command: ["/djctl", "app", "uninstall"]
                 env:
                   - name: DB_NAME
                     value: "django"
