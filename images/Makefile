@@ -14,7 +14,7 @@ images: controller \
 
 CONTROLLER_BINS := controller/bin
 $(CONTROLLER_BINS):
-	$(MAKE) -C ../tool/djctl
+	cd ../tool/djctl && $(MAKE)
 	mkdir $(CONTROLLER_BINS)
 	cp ../tool/djctl/bin/djctl $(CONTROLLER_BINS)/
 
