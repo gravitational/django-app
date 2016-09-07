@@ -11,9 +11,10 @@ import (
 type ServiceMethod string
 
 const (
-	OperationDBCreate ServiceMethod = "DatabaseOperation.Create"
-	OperationDBDelete ServiceMethod = "DatabaseOperation.Delete"
-	OperationDBBackup ServiceMethod = "DatabaseOperation.Backup"
+	OperationDBCreate  ServiceMethod = "DatabaseOperation.Create"
+	OperationDBDelete  ServiceMethod = "DatabaseOperation.Delete"
+	OperationDBBackup  ServiceMethod = "DatabaseOperation.Backup"
+	OperationDBRestore ServiceMethod = "DatabaseOperation.Restore"
 )
 
 type Client struct {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
@@ -33,6 +34,29 @@ func Update(c *Client, dbName, dbBackupPath string) error {
 		return trace.Wrap(err)
 	}
 	log.Infof("Reply: %s", rpcReply)
+
+	log.Infof("Deleting old Service and Replication Controller")
+	kubeReply, err := rigging.FromFile(rigging.ActionDelete, "/var/lib/gravity/resources/django.yaml")
+	if err != nil {
+		return trace.Wrap(err, fmt.Sprintf("Reply: %s", string(kubeReply)))
+	}
+
+	log.Infof("Creating new Service and Replication Controller")
+	kubeReply, err = rigging.FromFile(rigging.ActionCreate, "/var/lib/gravity/resources/django.yaml")
+	if err != nil {
+		log.Errorf("Creating new version was failed. Reply: %s", string(kubeReply))
+
+		log.Infof("Restore database '%s' from '%s', call procedure '%s'", dbName, dbBackupPath, OperationDBRestore)
+		rpcReply, err := c.Execute(OperationDBRestore, dbBackupPath)
+		if err != nil {
+			return trace.Wrap(err)
+		}
+		log.Infof("Reply: %s", rpcReply)
+
+		return errors.New("Update was failed, but ")
+	}
+
+	log.Info("Done.")
 
 	return nil
 }

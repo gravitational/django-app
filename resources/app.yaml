@@ -76,6 +76,8 @@ hooks:
                 env:
                   - name: DB_NAME
                     value: "django"
+                  - name: "DB_BACKUP_PATH"
+                    value: "/var/backups"
   uninstall:
     spec:
       apiVersion: batch/v1
